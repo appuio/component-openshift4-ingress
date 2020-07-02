@@ -1,3 +1,6 @@
 parameters:
   openshift4_ingress:
     namespace: openshift-ingress-operator
+    ingressControllers:
+      default:
+        replicas: 2
