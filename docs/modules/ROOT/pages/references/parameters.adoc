@@ -1,0 +1,27 @@
+= Parameters
+
+The parent key for all of the following parameters is `openshift4_ingress`.
+
+
+== `ingressControllers`
+
+[horizontal]
+type:: dictionary
+default:: Default ingress controller.
+
+A dictionary holding the `.spec` for ingress controllers.
+The keys of the dict are used as names for the ingress controllers.
+
+See the https://docs.openshift.com/container-platform/4.4/networking/ingress-operator.html#nw-ingress-controller-configuration-parameters_configuring-ingress[OpenShift docs] for available parameters.
+
+
+== Example
+
+[source,yaml]
+----
+ingressControllers:
+  prod:
+    namespaceSelector:
+      matchLabels:
+        environment: prod
+----
