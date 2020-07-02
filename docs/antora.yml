@@ -1,0 +1,6 @@
+name: openshift4-ingress
+title: openshift4-ingress
+version: master
+start_page: ROOT:index.adoc
+nav:
+  - modules/ROOT/partials/nav.adoc

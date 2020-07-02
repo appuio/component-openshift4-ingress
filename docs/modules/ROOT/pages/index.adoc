@@ -1,0 +1,3 @@
+= openshift4-ingress: A Commodore component to manage OpenShift 4 Ingress Controller
+
+{doctitle} is a Commodore component for Managing the OpenShift 4 https://docs.openshift.com/container-platform/4.4/networking/configuring_ingress_cluster_traffic/configuring-ingress-cluster-traffic-ingress-controller.html#configuring-ingress-cluster-traffic-ingress-controller[ingress controller].
