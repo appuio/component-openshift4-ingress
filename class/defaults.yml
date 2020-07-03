@@ -1,6 +1,15 @@
 parameters:
   openshift4_ingress:
-    namespace: openshift-ingress-operator
+    namespace: openshift-ingress
+    cloud:
+      provider: ${cloud:provider}
+      aws:
+        accessKey: copy-from-cluster
+      azure:
+        clientID: copy-from-cluster
+        subscriptionID: copy-from-cluster
+        tenantID: copy-from-cluster
+        resourceGroupName: copy-from-cluster
     ingressControllers:
       default:
         replicas: 2

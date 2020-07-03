@@ -1,3 +1,20 @@
 = openshift4-ingress: A Commodore component to manage OpenShift 4 Ingress Controller
 
 {doctitle} is a Commodore component for Managing the OpenShift 4 https://docs.openshift.com/container-platform/4.4/networking/configuring_ingress_cluster_traffic/configuring-ingress-cluster-traffic-ingress-controller.html#configuring-ingress-cluster-traffic-ingress-controller[ingress controller].
+
+
+== Wildcard Certificates
+
+If no `defaultCertificate` is specified for an ingress controller, a Let's Encrypt wildcard certificate is provisioned.
+This requires the domain to be set up so that https://letsencrypt.org/docs/challenge-types/#dns-01-challenge[dns-01-challenge] can be used.
+
+
+=== Supported DNS Services
+
+The following DNS service providers are currently implemented:
+
+* GCP (tested)
+* AWS (untested)
+* Azure (untested)
+
+If your cluster is running on a different cloud provider you must use one of the https://cert-manager.io/docs/configuration/acme/dns01/#supported-dns01-providers[supported DNS01 providers] in order to use Let's Encrypt wildcard certificates.
