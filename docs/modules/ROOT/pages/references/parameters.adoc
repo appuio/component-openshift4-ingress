@@ -14,6 +14,106 @@ The keys of the dict are used as names for the ingress controllers.
 
 See the https://docs.openshift.com/container-platform/4.4/networking/ingress-operator.html#nw-ingress-controller-configuration-parameters_configuring-ingress[OpenShift docs] for available parameters.
 
+The `domain` parameter is required.
+
+
+== `cloud.provider`
+
+[horizontal]
+type:: string
+default:: `${cloud:provider}`
+
+The name of the cloud provider where the DNS service is hosted.
+This usually should be the fact `cloud.provider`
+
+
+== `cloud.gcp.projectName`
+
+[horizontal]
+type:: string
+default:: undefined
+
+The GCP project name in which the DNS setup is hosted.
+
+
+== `cloud.aws.accessKey`
+
+[horizontal]
+type:: string
+default:: undefined
+
+Access key ID to be used for Route53 access.
+The credentials will be created by this component via a `CredentialsRequest`.
+Unfortunately the access key ID must be copied from the resulting secret:
+
+[source,console]
+--
+kubectl get secret ingress-cert-issuer-credentials \
+  -n openshift-ingress \
+  -o jsonpath='{.data.aws_access_key_id}' | \
+  base64 --decode
+--
+
+
+== `cloud.azure.clientID`
+
+[horizontal]
+type:: string
+default:: undefined
+
+[source,console]
+--
+kubectl get secret ingress-cert-issuer-credentials \
+  -n openshift-ingress \
+  -o jsonpath='{.data.azure_client_id}' | \
+  base64 --decode
+--
+
+
+== `cloud.azure.subscriptionID`
+
+[horizontal]
+type:: string
+default:: undefined
+
+[source,console]
+--
+kubectl get secret ingress-cert-issuer-credentials \
+  -n openshift-ingress \
+  -o jsonpath='{.data.azure_subscription_id}' | \
+  base64 --decode
+--
+
+
+== `cloud.azure.tenantID`
+
+[horizontal]
+type:: string
+default:: undefined
+
+[source,console]
+--
+kubectl get secret ingress-cert-issuer-credentials \
+  -n openshift-ingress \
+  -o jsonpath='{.data.azure_tenant_id}' | \
+  base64 --decode
+--
+
+
+== `cloud.azure.resourceGroupName`
+
+[horizontal]
+type:: string
+default:: undefined
+
+[source,console]
+--
+kubectl get secret ingress-cert-issuer-credentials \
+  -n openshift-ingress \
+  -o jsonpath='{.data.azure_resourcegroup}' | \
+  base64 --decode
+--
+
 
 == Example
 
@@ -21,6 +121,9 @@ See the https://docs.openshift.com/container-platform/4.4/networking/ingress-ope
 ----
 ingressControllers:
   prod:
+    domain: apps.example.com
+    defaultCertificate:
+      name: prod-wildcard
     namespaceSelector:
       matchLabels:
         environment: prod
