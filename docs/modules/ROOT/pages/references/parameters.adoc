@@ -16,6 +16,8 @@ See the https://docs.openshift.com/container-platform/4.4/networking/ingress-ope
 
 The `domain` parameter is required.
 
+To remove all ingress controllers, set to `null`.
+
 
 == `cloud.provider`
 
