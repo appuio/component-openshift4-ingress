@@ -13,3 +13,7 @@ parameters:
     ingressControllers:
       default:
         replicas: 2
+        nodePlacement:
+          nodeSelector:
+            matchLabels:
+              node-role.kubernetes.io/infra: ""

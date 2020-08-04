@@ -18,3 +18,9 @@ The following DNS service providers are currently implemented:
 * Azure (untested)
 
 If your cluster is running on a different cloud provider you must use one of the https://cert-manager.io/docs/configuration/acme/dns01/#supported-dns01-providers[supported DNS01 providers] in order to use Let's Encrypt wildcard certificates.
+
+
+== Node Selector
+
+A node selector is configured to only run the ingress controller pods on infra nodes.
+This helps to configure the load balancer on only a subset of the nodes.
