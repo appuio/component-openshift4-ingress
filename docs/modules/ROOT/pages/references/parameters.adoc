@@ -29,6 +29,16 @@ The name of the cloud provider where the DNS service is hosted.
 This usually should be the fact `cloud.provider`
 
 
+== `cloud.credentials`
+
+[horizontal]
+type:: string
+default:: undefined
+
+The cloud provider credentials which will be used by the Issuer.
+If this is not set, a `CredentialsRequest` will be created.
+
+
 == `cloud.gcp.projectName`
 
 [horizontal]
