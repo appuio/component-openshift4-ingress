@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation ([#1])
 - Default wildcard cert ([#2])
+- Secret with cloud credentials ([#5])
 
 ### Fixed
 - Allow `null` value for `ingressControllers` ([#3])
@@ -18,3 +19,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#1]: https://github.com/appuio/component-openshift4-ingress/pull/1
 [#2]: https://github.com/appuio/component-openshift4-ingress/pull/2
 [#3]: https://github.com/appuio/component-openshift4-ingress/pull/3
+[#5]: https://github.com/appuio/component-openshift4-ingress/pull/5

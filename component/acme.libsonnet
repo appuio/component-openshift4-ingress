@@ -1,4 +1,5 @@
 local certManager = import 'lib/cert-manager.libsonnet';
+local com = import 'lib/commodore.libjsonnet';
 local kap = import 'lib/kapitan.libjsonnet';
 local kube = import 'lib/kube.libjsonnet';
 local inv = kap.inventory();
@@ -6,6 +7,7 @@ local inv = kap.inventory();
 local params = inv.parameters.openshift4_ingress;
 local cloudcredentialv1 = 'cloudcredential.openshift.io/v1';
 local credentialsSecretName = 'ingress-cert-issuer-credentials';
+local hasCredentials = if std.objectHas(params.cloud, 'credentials') then true else false;
 
 
 {
@@ -22,7 +24,11 @@ local credentialsSecretName = 'ingress-cert-issuer-credentials';
     },
   },
   issuer(): [
-    kube._Object(cloudcredentialv1, 'CredentialsRequest', 'ingress-cert-issuer') {
+    if hasCredentials then kube.Secret(credentialsSecretName) {
+      stringData: {
+        credentials: params.cloud.credentials,
+      },
+    } else kube._Object(cloudcredentialv1, 'CredentialsRequest', 'ingress-cert-issuer') {
       metadata+: {
         namespace: 'openshift-cloud-credential-operator',
       },
@@ -77,7 +83,7 @@ local credentialsSecretName = 'ingress-cert-issuer-credentials';
                 project: params.cloud.gcp.projectName,
                 serviceAccountSecretRef: {
                   name: credentialsSecretName,
-                  key: 'service_account.json',
+                  key: if hasCredentials then 'credentials' else 'service_account.json',
                 },
               },
             } else if params.cloud.provider == 'aws' then {
@@ -86,7 +92,7 @@ local credentialsSecretName = 'ingress-cert-issuer-credentials';
                 accessKeyID: params.cloud.aws.accessKey,
                 secretAccessKeySecretRef: {
                   name: credentialsSecretName,
-                  key: 'aws_secret_access_key',
+                  key: if hasCredentials then 'credentials' else 'aws_secret_access_key',
                 },
               },
             } else if params.cloud.provider == 'azure' then {
@@ -94,7 +100,7 @@ local credentialsSecretName = 'ingress-cert-issuer-credentials';
                 clientID: params.cloud.azure.clientID,
                 clientSecretSecretRef: {
                   name: credentialsSecretName,
-                  key: 'azure_client_secret',
+                  key: if hasCredentials then 'credentials' else 'azure_client_secret',
                 },
                 subscriptionID: params.cloud.azure.subscriptionID,
                 tenantID: params.cloud.azure.tenantID,
