@@ -131,12 +131,14 @@ kubectl get secret ingress-cert-issuer-credentials \
 
 [source,yaml]
 ----
-ingressControllers:
-  prod:
-    domain: apps.example.com
-    defaultCertificate:
-      name: prod-wildcard
-    namespaceSelector:
-      matchLabels:
-        environment: prod
+parameters:
+  openshift4_ingress:
+    ingressControllers:
+      prod:
+        domain: apps.example.com
+        defaultCertificate:
+          name: prod-wildcard
+        namespaceSelector:
+          matchLabels:
+            environment: prod
 ----
