@@ -25,7 +25,7 @@ local anyControllerUsesAcme = std.foldl(
         namespace: params.namespace + '-operator',
       },
       spec: {
-        [if hasAcmeSupport then defaultCertificate]: {
+        [if hasAcmeSupport then 'defaultCertificate']: {
           name: acmeCertName,
         },
       } + params.ingressControllers[name],
