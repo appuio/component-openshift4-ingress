@@ -4,11 +4,13 @@ local kube = import 'lib/kube.libjsonnet';
 local inv = kap.inventory();
 
 local params = inv.parameters.openshift4_ingress;
+local cloud = inv.parameters.facts.cloud;
+local hasAcmeSupport = std.objectHas(params.cloud, cloud);
 local ingressControllers =
   if params.ingressControllers != null
   then std.objectFields(params.ingressControllers)
   else [];
-local usesAcme(name) = !std.objectHas(params.ingressControllers[name], 'defaultCertificate');
+local usesAcme(name) = hasAcmeSupport && !std.objectHas(params.ingressControllers[name], 'defaultCertificate');
 local anyControllerUsesAcme = std.foldl(
   function(x, field) x || usesAcme(field),
   ingressControllers,
@@ -23,7 +25,7 @@ local anyControllerUsesAcme = std.foldl(
         namespace: params.namespace + '-operator',
       },
       spec: {
-        defaultCertificate: {
+        [if hasAcmeSupport then defaultCertificate]: {
           name: acmeCertName,
         },
       } + params.ingressControllers[name],

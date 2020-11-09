@@ -5,8 +5,9 @@
 
 == Wildcard Certificates
 
-If no `defaultCertificate` is specified for an ingress controller, a Let's Encrypt wildcard certificate is provisioned.
-This requires the domain to be set up so that https://letsencrypt.org/docs/challenge-types/#dns-01-challenge[dns-01-challenge] can be used.
+If no `defaultCertificate` is specified for an ingress controller, OpenShift 4 will create a cluster signed certificate for that ingress.
+Usually, that certificate isn't deemed to be valid by browsers.
+On clouds providing DNS services that allow the use of https://letsencrypt.org/docs/challenge-types/#dns-01-challenge[dns-01-challenge], a Let's Encrypt wildcard certificate is provisioned.
 
 
 === Supported DNS Services
