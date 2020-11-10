@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Allow `null` value for `ingressControllers` ([#3])
 - Fix syntax error by quiting key `defaultCertificate` ([#10])
+- Fix usage of cloud provider param ([#11])
 
 [Unreleased]: https://github.com/appuio/component-openshift4-ingress/compare/44356edb4db73e762cd8896fb3b5a6f11f698799...HEAD
 
@@ -29,3 +30,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#5]: https://github.com/appuio/component-openshift4-ingress/pull/5
 [#9]: https://github.com/appuio/component-openshift4-ingress/pull/9
 [#10]: https://github.com/appuio/component-openshift4-ingress/pull/10
+[#11]: https://github.com/appuio/component-openshift4-ingress/pull/11
