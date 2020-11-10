@@ -4,8 +4,7 @@ local kube = import 'lib/kube.libjsonnet';
 local inv = kap.inventory();
 
 local params = inv.parameters.openshift4_ingress;
-local cloud = inv.parameters.facts.cloud;
-local hasAcmeSupport = std.objectHas(params.cloud, cloud);
+local hasAcmeSupport = std.objectHas(params.cloud, params.cloud.provider);
 local ingressControllers =
   if params.ingressControllers != null
   then std.objectFields(params.ingressControllers)
