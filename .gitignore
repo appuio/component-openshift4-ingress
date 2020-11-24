@@ -2,3 +2,4 @@ manifests/
 .idea
 compiled/
 vendor/
+jsonnetfile.lock.json
