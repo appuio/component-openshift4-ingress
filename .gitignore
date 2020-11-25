@@ -1,0 +1,4 @@
+manifests/
+.idea
+compiled/
+vendor/
