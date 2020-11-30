@@ -1,6 +1,7 @@
 local acme = import 'acme.libsonnet';
 local kap = import 'lib/kapitan.libjsonnet';
 local kube = import 'lib/kube.libjsonnet';
+local resourcelocker = import 'lib/resource-locker.libjsonnet';
 local inv = kap.inventory();
 
 local params = inv.parameters.openshift4_ingress;
@@ -15,6 +16,14 @@ local anyControllerUsesAcme = std.foldl(
   ingressControllers,
   false,
 );
+
+local defaultNamespacePatch = resourcelocker.Patch(kube.Namespace('default'), {
+  metadata: {
+    labels: {
+      'network.openshift.io/policy-group': 'hostNetwork',
+    },
+  },
+});
 
 {
   local acmeCertName = 'acme-wildcard-' + name,
@@ -37,4 +46,5 @@ local anyControllerUsesAcme = std.foldl(
 } + {
   [if anyControllerUsesAcme then 'acmeIssuer']: acme.issuer(),
   [if std.length(ingressControllers) == 0 then '.gitkeep']: {},
+  [if std.length(ingressControllers) > 0 then '00_label_patches']: defaultNamespacePatch,
 }

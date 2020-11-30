@@ -5,8 +5,12 @@ SHELL := bash
 .DELETE_ON_ERROR:
 .SUFFIXES:
 
+# Commodore takes the root dir name as the component name
+COMPONENT_NAME ?= $(shell basename ${PWD} | sed s/component-//)
+
+
 DOCKER_CMD   ?= docker
-DOCKER_ARGS  ?= run --rm --user "$$(id -u)" -v "$${PWD}:/component" --workdir /component
+DOCKER_ARGS  ?= run --rm --user "$$(id -u)" -v "$${PWD}:/$(COMPONENT_NAME)" --workdir /$(COMPONENT_NAME)
 
 JSONNET_FILES   ?= $(shell find . -type f -name '*.*jsonnet' -or -name '*.libsonnet')
 JSONNETFMT_ARGS ?= --in-place
@@ -19,9 +23,12 @@ YAMLLINT_CONFIG ?= .yamllint.yml
 YAMLLINT_IMAGE  ?= docker.io/cytopia/yamllint:latest
 YAMLLINT_DOCKER ?= $(DOCKER_CMD) $(DOCKER_ARGS) $(YAMLLINT_IMAGE)
 
-VALE_CMD  ?= $(DOCKER_CMD) $(DOCKER_ARGS) --volume "$${PWD}"/docs/modules:/pages vshn/vale:2.1.1
+VALE_CMD  ?= $(DOCKER_CMD) $(DOCKER_ARGS) --volume "$${PWD}"/docs/modules:/pages docker.io/vshn/vale:2.1.1
 VALE_ARGS ?= --minAlertLevel=error --config=/pages/ROOT/pages/.vale.ini /pages
 
+
+COMMODORE_CMD  ?= $(DOCKER_CMD) $(DOCKER_ARGS) docker.io/projectsyn/commodore:latest component compile .
+JB_CMD         ?= $(DOCKER_CMD) $(DOCKER_ARGS) --entrypoint /usr/local/bin/jb docker.io/projectsyn/commodore:latest install
 
 .PHONY: all
 all: lint
@@ -47,3 +54,8 @@ format: format_jsonnet
 .PHONY: format_jsonnet
 format_jsonnet: $(JSONNET_FILES)
 	$(JSONNET_DOCKER) $(JSONNETFMT_ARGS) -- $?
+
+.PHONY: compile
+compile:
+	$(JB_CMD)
+	$(COMMODORE_CMD)
