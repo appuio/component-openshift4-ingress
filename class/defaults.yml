@@ -2,7 +2,7 @@ parameters:
   openshift4_ingress:
     namespace: openshift-ingress
     cloud:
-      provider: ${facts.cloud}
+      provider: ${facts:cloud}
       aws:
         accessKey: copy-from-cluster
       azure:

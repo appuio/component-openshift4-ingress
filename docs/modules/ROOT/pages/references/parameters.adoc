@@ -23,7 +23,7 @@ To remove all ingress controllers, set to `null`.
 
 [horizontal]
 type:: string
-default:: `${facts.cloud}`
+default:: `${facts:cloud}`
 
 The name of the cloud provider where the DNS service is hosted.
 This usually should be the fact `cloud.provider`
