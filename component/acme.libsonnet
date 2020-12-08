@@ -88,7 +88,7 @@ local hasCredentials = if std.objectHas(params.cloud, 'credentials') then true e
               },
             } else if params.cloud.provider == 'aws' then {
               route53: {
-                region: inv.parameters.cloud.region,
+                region: inv.parameters.facts.region,
                 accessKeyID: params.cloud.aws.accessKey,
                 secretAccessKeySecretRef: {
                   name: credentialsSecretName,
