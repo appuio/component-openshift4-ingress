@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Do nothing if cloud does not support ACME ([#9])
+- Remove usage of deprecated parameters ([#13])
 
 ### Fixed
 - Allow `null` value for `ingressControllers` ([#3])
@@ -31,3 +32,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#9]: https://github.com/appuio/component-openshift4-ingress/pull/9
 [#10]: https://github.com/appuio/component-openshift4-ingress/pull/10
 [#11]: https://github.com/appuio/component-openshift4-ingress/pull/11
+[#13]: https://github.com/appuio/component-openshift4-ingress/pull/13
