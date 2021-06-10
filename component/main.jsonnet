@@ -31,6 +31,7 @@ local defaultNamespacePatch = resourcelocker.Patch(kube.Namespace('default'), {
     [kube._Object('operator.openshift.io/v1', 'IngressController', name) {
       metadata+: {
         namespace: params.namespace + '-operator',
+        [if std.objectHas(params.ingressControllerAnnotations, name) then 'annotations']: params.ingressControllerAnnotations[name],
       },
       spec: {
         [if hasAcmeSupport then 'defaultCertificate']: {

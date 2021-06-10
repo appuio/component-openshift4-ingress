@@ -19,6 +19,15 @@ The `domain` parameter is required.
 To remove all ingress controllers, set to `null`.
 
 
+== `ingressControllerAnnotations`
+
+[horizontal]
+type:: dictionary
+default:: {}
+
+A dictionary holding the `annotations` for ingress controllers.
+The keys of the dict are the names of the ingress controllers to annotate.
+
 == `cloud.provider`
 
 [horizontal]
@@ -141,4 +150,7 @@ parameters:
         namespaceSelector:
           matchLabels:
             environment: prod
+    ingressControllerAnnotations:
+      prod:
+        ingress.operator.openshift.io/default-enable-http2: true
 ----
