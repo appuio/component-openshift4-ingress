@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Default wildcard cert ([#2])
 - Node selector to target infra nodes ([#4])
 - Secret with cloud credentials ([#5])
+- Support for annotations on ingress controllers ([#15])
 
 ### Changed
 
@@ -33,3 +34,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#10]: https://github.com/appuio/component-openshift4-ingress/pull/10
 [#11]: https://github.com/appuio/component-openshift4-ingress/pull/11
 [#13]: https://github.com/appuio/component-openshift4-ingress/pull/13
+[#15]: https://github.com/appuio/component-openshift4-ingress/pull/15

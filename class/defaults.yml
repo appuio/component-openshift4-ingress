@@ -17,3 +17,4 @@ parameters:
           nodeSelector:
             matchLabels:
               node-role.kubernetes.io/infra: ""
+    ingressControllerAnnotations: {}
