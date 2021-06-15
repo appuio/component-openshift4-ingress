@@ -23,7 +23,7 @@ To remove all ingress controllers, set to `null`.
 
 [horizontal]
 type:: dictionary
-default:: {}
+default:: `{}`
 
 A dictionary holding the `annotations` for ingress controllers.
 The keys of the dict are the names of the ingress controllers to annotate.
