@@ -40,11 +40,11 @@ local hasCredentials = if std.objectHas(params.cloud, 'credentials') then true e
         providerSpec: if params.cloud.provider == 'gcp' then {
           apiVersion: cloudcredentialv1,
           kind: 'GCPProviderSpec',
-          predefinedRoles: ['roles/dns.admin'],
+          predefinedRoles: [ 'roles/dns.admin' ],
         } else if params.cloud.provider == 'aws' then {
           apiVersion: cloudcredentialv1,
           kind: 'AWSProviderSpec',
-          statementEntries: [{
+          statementEntries: [ {
             effect: 'Allow',
             action: [
               'route53:ChangeResourceRecordSets',
@@ -53,15 +53,15 @@ local hasCredentials = if std.objectHas(params.cloud, 'credentials') then true e
             resource: 'arn:aws:route53:::hostedzone/*',
           }, {
             effect: 'Allow',
-            action: ['route53:ListHostedZonesByName'],
+            action: [ 'route53:ListHostedZonesByName' ],
             resource: '*',
-          }],
+          } ],
         } else if params.cloud.provider == 'azure' then {
           apiVersion: cloudcredentialv1,
           kind: 'AzureProviderSpec',
-          roleBindings: [{
+          roleBindings: [ {
             role: 'DNS Zone Contributor',
-          }],
+          } ],
         } else
           error 'Cloud provider "' + params.cloud.provider + '" is not implemented.',
       },
@@ -77,7 +77,7 @@ local hasCredentials = if std.objectHas(params.cloud, 'credentials') then true e
             name: 'ingress-cert-issuer',
           },
           server: 'https://acme-v02.api.letsencrypt.org/directory',
-          solvers: [{
+          solvers: [ {
             dns01: if params.cloud.provider == 'gcp' then {
               clouddns: {
                 project: params.cloud.gcp.projectName,
@@ -107,7 +107,7 @@ local hasCredentials = if std.objectHas(params.cloud, 'credentials') then true e
                 resourceGroupName: params.cloud.azure.resourceGroupName,
               },
             } else error 'Cloud provider "' + params.cloud.provider + '" is not implemented.',
-          }],
+          } ],
         },
       },
     },
