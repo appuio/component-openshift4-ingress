@@ -45,7 +45,7 @@ type:: string
 default:: undefined
 
 The cloud provider credentials which will be used by the Issuer.
-If this is not set, a `CredentialsRequest` will be created.
+If this isn't set, a `CredentialsRequest` will be created.
 
 
 == `cloud.gcp.projectName`
