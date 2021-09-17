@@ -1,0 +1,8 @@
+:global:
+  componentName: openshift4-ingress
+  feature_goUnitTests: false
+  feature_goldenTests: true
+
+docs/antora.yml:
+  name: openshift4-ingress
+  title: Openshift 4 Ingress
