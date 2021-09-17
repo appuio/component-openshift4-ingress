@@ -25,31 +25,37 @@ local defaultNamespacePatch = resourcelocker.Patch(kube.Namespace('default'), {
   },
 });
 
-{
-  local acmeCertName = 'acme-wildcard-' + name,
-  local annotations =
-    if std.objectHas(params.ingressControllerAnnotations, name) then
-      params.ingressControllerAnnotations[name],
+if std.length(ingressControllers) > 0 then
+  {
+    local acmeCertName = 'acme-wildcard-' + name,
+    local annotations =
+      if std.objectHas(params.ingressControllerAnnotations, name) then
+        params.ingressControllerAnnotations[name],
 
-  [name]:
-    [ kube._Object('operator.openshift.io/v1', 'IngressController', name) {
-      metadata+: {
-        namespace: params.namespace + '-operator',
-        [if annotations != null then 'annotations']: annotations,
-      },
-      spec: {
-        [if hasAcmeSupport then 'defaultCertificate']: {
-          name: acmeCertName,
+    [name]:
+      [ kube._Object('operator.openshift.io/v1', 'IngressController', name) {
+        metadata+: {
+          namespace: params.namespace + '-operator',
+          [if annotations != null then 'annotations']: annotations,
         },
-      } + params.ingressControllers[name],
-    } ] +
-    if usesAcme(name) then
-      [
-        acme.cert(acmeCertName, [ '*.' + params.ingressControllers[name].domain ]),
-      ] else []
-  for name in ingressControllers
-} + {
-  [if anyControllerUsesAcme then 'acmeIssuer']: acme.issuer(),
-  [if std.length(ingressControllers) == 0 then '.gitkeep']: {},
-  [if std.length(ingressControllers) > 0 then '00_label_patches']: defaultNamespacePatch,
-}
+        spec: {
+          [if hasAcmeSupport then 'defaultCertificate']: {
+            name: acmeCertName,
+          },
+        } + params.ingressControllers[name],
+      } ] +
+      if usesAcme(name) then
+        [
+          acme.cert(acmeCertName, [ '*.' + params.ingressControllers[name].domain ]),
+        ] else []
+    for name in ingressControllers
+  } + {
+    '00_label_patches': defaultNamespacePatch,
+    [if anyControllerUsesAcme then 'acmeIssuer']: acme.issuer(),
+  }
+else
+  // if no ingressControllers are configured, only emit an empty `.gitkeep`
+  // file.
+  {
+    '.gitkeep': {},
+  }
