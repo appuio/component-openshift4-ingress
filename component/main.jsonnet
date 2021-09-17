@@ -1,4 +1,6 @@
 local acme = import 'acme.libsonnet';
+local cm = import 'lib/cert-manager.libsonnet';
+local com = import 'lib/commodore.libjsonnet';
 local kap = import 'lib/kapitan.libjsonnet';
 local kube = import 'lib/kube.libjsonnet';
 local resourcelocker = import 'lib/resource-locker.libjsonnet';
@@ -24,6 +26,25 @@ local defaultNamespacePatch = resourcelocker.Patch(kube.Namespace('default'), {
     },
   },
 });
+
+local extraSecrets = [
+  kube.Secret(kube.hyphenate(s)) {
+    metadata+: {
+      namespace: params.namespace,
+    },
+  } + com.makeMergeable(params.secrets[s])
+  for s in std.objectFields(params.secrets)
+];
+
+local extraCerts = [
+  local cname = kube.hyphenate(c);
+  cm.cert(cname) {
+    metadata+: {
+      namespace: params.namespace,
+    },
+  } + com.makeMergeable(params.cert_manager_certs[c])
+  for c in std.objectFields(params.cert_manager_certs)
+];
 
 if std.length(ingressControllers) > 0 then
   {
@@ -52,6 +73,8 @@ if std.length(ingressControllers) > 0 then
   } + {
     '00_label_patches': defaultNamespacePatch,
     [if anyControllerUsesAcme then 'acmeIssuer']: acme.issuer,
+    [if std.length(extraSecrets) > 0 then '10_extra_secrets']: extraSecrets,
+    [if std.length(extraCerts) > 0 then '10_extra_certificates']: extraCerts,
   }
 else
   // if no ingressControllers are configured, only emit an empty `.gitkeep`
