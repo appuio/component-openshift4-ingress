@@ -27,11 +27,15 @@ local defaultNamespacePatch = resourcelocker.Patch(kube.Namespace('default'), {
 
 {
   local acmeCertName = 'acme-wildcard-' + name,
+  local annotations =
+    if std.objectHas(params.ingressControllerAnnotations, name) then
+      params.ingressControllerAnnotations[name],
+
   [name]:
     [ kube._Object('operator.openshift.io/v1', 'IngressController', name) {
       metadata+: {
         namespace: params.namespace + '-operator',
-        [if std.objectHas(params.ingressControllerAnnotations, name) then 'annotations']: params.ingressControllerAnnotations[name],
+        [if annotations != null then 'annotations']: annotations,
       },
       spec: {
         [if hasAcmeSupport then 'defaultCertificate']: {
