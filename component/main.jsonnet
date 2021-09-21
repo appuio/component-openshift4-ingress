@@ -27,12 +27,26 @@ local defaultNamespacePatch = resourcelocker.Patch(kube.Namespace('default'), {
   },
 });
 
+local isTlsSecret(secret) =
+  local secretKeys = std.set(std.objectFields(secret.stringData));
+  local keyDiff = std.setDiff(secretKeys, std.set([
+    'ca.crt',
+    'tls.crt',
+    'tls.key',
+  ]));
+  secret.type == 'kubernetes.io/tls' && std.length(keyDiff) == 0;
+
 local extraSecrets = [
-  kube.Secret(kube.hyphenate(s)) {
+  local secret = kube.Secret(kube.hyphenate(s)) {
+    type: 'kubernetes.io/tls',
     metadata+: {
       namespace: params.namespace,
     },
-  } + com.makeMergeable(params.secrets[s])
+  } + com.makeMergeable(params.secrets[s]);
+  if isTlsSecret(secret) then
+    secret
+  else
+    error "Invalid secret definition for key '%s'. This component expects secret definitions which are valid for kubernetes.io/tls secrets." % s
   for s in std.objectFields(params.secrets)
 ];
 
