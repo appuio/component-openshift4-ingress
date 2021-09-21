@@ -51,7 +51,7 @@ if std.length(ingressControllers) > 0 then
     for name in ingressControllers
   } + {
     '00_label_patches': defaultNamespacePatch,
-    [if anyControllerUsesAcme then 'acmeIssuer']: acme.issuer(),
+    [if anyControllerUsesAcme then 'acmeIssuer']: acme.issuer,
   }
 else
   // if no ingressControllers are configured, only emit an empty `.gitkeep`
