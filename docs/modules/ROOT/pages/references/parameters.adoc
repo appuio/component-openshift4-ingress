@@ -135,8 +135,34 @@ kubectl get secret ingress-cert-issuer-credentials \
   base64 --decode
 --
 
+== `secrets`
 
-== Example
+[horizontal]
+type:: dictionary
+default:: `{}`
+
+Each entry in parameter `secrets` is deployed onto the cluster as a Kubernetes Secret with `type=kubernetes.io/tls`.
+The component has basic validation to ensure the secret contents are a plausible Kubernetes TLS secret.
+
+The dictionary keys are used as `metadata.name` for the resulting `Secret` resources.
+The dictionary values are directly directly merged into a `Secret` resource which only has `type=kubernetes.io/tls` set.
+The secrets are created in the namespace indicated by parameter `namespace`.
+
+== `cert_manager_certs`
+
+[horizontal]
+type:: dictionary
+default:: `{}`
+
+Each entry in parameter `cert_manager_certs` is deployed onto the cluster as a cert-manager `Certificate` resource.
+
+The dictionary keys are used as `metadata.name` for the resulting `Certificate` resources.
+The component also uses the dictionary keys to generate a default value of `<key>-tls` for the field `spec.secretName`.
+The dictionary values are then directly directly merged into the mostly empty `Certificate` resources.
+
+== Examples
+
+=== Managing a secret for the wildcard certificate
 
 [source,yaml]
 ----
@@ -146,6 +172,7 @@ parameters:
       prod:
         domain: apps.example.com
         defaultCertificate:
+          # Use the secret configured below
           name: prod-wildcard
         namespaceSelector:
           matchLabels:
@@ -153,4 +180,39 @@ parameters:
     ingressControllerAnnotations:
       prod:
         ingress.operator.openshift.io/default-enable-http2: true
+    secrets:
+      prod-wildcard:
+        stringData:
+          tls.key: "?{vaultkv:...}" # reference to private key in Vault
+          tls.crt: "?{vaultkv:...}" # reference to cert in Vault
+----
+
+=== Managing a cert-manager wildcard certificate
+
+[NOTE]
+====
+This requires an issuer which supports DNS01 challenges.
+See the xref:cert-manager:ROOT:how-tos/dns01.adoc[Using DNS01 challenges] how-to for component cert-manager to get started with DNS01 challenges.
+====
+
+[source,yaml]
+----
+parameters:
+  openshift4_ingress:
+    ingressControllers:
+      prod:
+        domain: apps.example.com
+        defaultCertificate:
+          # Use the secret for the certificate below.
+          # By default, the component creates a secret with name
+          # `prod-wildcard-tls` for certificate resource `prod-wildcard`
+          name: prod-wildcard-tls
+    cert_manager_certificates:
+      prod-wildcard:
+        spec:
+          dnsNames:
+            - '*.apps.example.com'
+          issuerRef:
+            name: letsencrypt-production
+            kind: ClusterIssuer
 ----
