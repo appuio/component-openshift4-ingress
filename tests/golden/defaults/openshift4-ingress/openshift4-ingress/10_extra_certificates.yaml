@@ -1,0 +1,19 @@
+apiVersion: cert-manager.io/v1alpha2
+dnsNames:
+  - example.com
+  - www.example.com
+issuerRef:
+  kind: ClusterIssuer
+  name: letsencrypt-production
+kind: Certificate
+metadata:
+  annotations: {}
+  labels:
+    name: test
+  name: test
+  namespace: openshift-ingress
+spec:
+  secretName: test-tls
+subject:
+  organizations:
+    - projectsyn
