@@ -145,7 +145,7 @@ Each entry in parameter `secrets` is deployed onto the cluster as a Kubernetes S
 The component has basic validation to ensure the secret contents are a plausible Kubernetes TLS secret.
 
 The dictionary keys are used as `metadata.name` for the resulting `Secret` resources.
-The dictionary values are directly directly merged into a `Secret` resource which only has `type=kubernetes.io/tls` set.
+The dictionary values are directly merged into a `Secret` resource which only has `type=kubernetes.io/tls` set.
 The secrets are created in the namespace indicated by parameter `namespace`.
 
 == `cert_manager_certs`
