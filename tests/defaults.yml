@@ -19,7 +19,7 @@ parameters:
           tls.key: "THEKEY"
 
     cert_manager_certs:
-      test:
+      test-tls:
         subject:
           organizations:
             - projectsyn

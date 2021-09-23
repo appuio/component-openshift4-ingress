@@ -57,7 +57,7 @@ local extraCerts = [
       namespace: params.namespace,
     },
     spec+: {
-      secretName: '%s-tls' % cname,
+      secretName: '%s' % cname,
     },
   } + com.makeMergeable(params.cert_manager_certs[c])
   for c in std.objectFields(params.cert_manager_certs)

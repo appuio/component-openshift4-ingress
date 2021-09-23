@@ -9,8 +9,8 @@ kind: Certificate
 metadata:
   annotations: {}
   labels:
-    name: test
-  name: test
+    name: test-tls
+  name: test-tls
   namespace: openshift-ingress
 spec:
   secretName: test-tls

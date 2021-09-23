@@ -156,8 +156,7 @@ default:: `{}`
 
 Each entry in parameter `cert_manager_certs` is deployed onto the cluster as a cert-manager `Certificate` resource.
 
-The dictionary keys are used as `metadata.name` for the resulting `Certificate` resources.
-The component also uses the dictionary keys to generate a default value of `<key>-tls` for the field `spec.secretName`.
+The dictionary keys are used as `metadata.name` and `spec.secretName` for the resulting `Certificate` resources.
 The dictionary values are then directly directly merged into the mostly empty `Certificate` resources.
 
 == Examples
@@ -208,7 +207,7 @@ parameters:
           # `prod-wildcard-tls` for certificate resource `prod-wildcard`
           name: prod-wildcard-tls
     cert_manager_certificates:
-      prod-wildcard:
+      prod-wildcard-tls:
         spec:
           dnsNames:
             - '*.apps.example.com'
