@@ -2,7 +2,7 @@ parameters:
   kapitan:
     dependencies:
       - type: https
-        source: https://raw.githubusercontent.com/projectsyn/component-cert-manager/v2.0.1/lib/cert-manager.libsonnet
+        source: https://raw.githubusercontent.com/projectsyn/component-cert-manager/v2.2.0/lib/cert-manager.libsonnet
         output_path: vendor/lib/cert-manager.libsonnet
       - type: https
         source: https://raw.githubusercontent.com/projectsyn/component-resource-locker/v2.0.0/lib/resource-locker.libjsonnet
@@ -10,3 +10,22 @@ parameters:
 
   resource_locker:
     namespace: syn-resource-locker
+
+  openshift4_ingress:
+    secrets:
+      test:
+        stringData:
+          tls.crt: "THECERTTIFICATE"
+          tls.key: "THEKEY"
+
+    cert_manager_certs:
+      test-tls:
+        subject:
+          organizations:
+            - projectsyn
+        dnsNames:
+          - example.com
+          - www.example.com
+        issuerRef:
+          name: letsencrypt-production
+          kind: ClusterIssuer
