@@ -36,32 +36,43 @@ local isTlsSecret(secret) =
   ]));
   secret.type == 'kubernetes.io/tls' && std.length(keyDiff) == 0;
 
-local extraSecrets = [
-  local secret = kube.Secret(kube.hyphenate(s)) {
-    type: 'kubernetes.io/tls',
-    metadata+: {
-      namespace: params.namespace,
-    },
-  } + com.makeMergeable(params.secrets[s]);
-  if isTlsSecret(secret) then
-    secret
-  else
-    error "Invalid secret definition for key '%s'. This component expects secret definitions which are valid for kubernetes.io/tls secrets." % s
-  for s in std.objectFields(params.secrets)
-];
+local extraSecrets = std.filter(
+  function(it) it != null,
+  [
+    local scontent = params.secrets[s];
+    local secret = kube.Secret(kube.hyphenate(s)) {
+      type: 'kubernetes.io/tls',
+      metadata+: {
+        namespace: params.namespace,
+      },
+    } + com.makeMergeable(scontent);
+    if scontent != null then
+      if isTlsSecret(secret) then
+        secret
+      else
+        error "Invalid secret definition for key '%s'. This component expects secret definitions which are valid for kubernetes.io/tls secrets." % s
+    for s in std.objectFields(params.secrets)
+  ]
+);
 
-local extraCerts = [
-  local cname = kube.hyphenate(c);
-  cm.cert(cname) {
-    metadata+: {
-      namespace: params.namespace,
-    },
-    spec+: {
-      secretName: '%s' % cname,
-    },
-  } + com.makeMergeable(params.cert_manager_certs[c])
-  for c in std.objectFields(params.cert_manager_certs)
-];
+local extraCerts = std.filter(
+  function(it) it != null,
+  [
+    local cname = kube.hyphenate(c);
+    local cert = params.cert_manager_certs[c];
+    if cert != null then
+      cm.cert(cname) {
+        metadata+: {
+          namespace: params.namespace,
+        },
+        spec+: {
+          secretName: '%s' % cname,
+        },
+      } + com.makeMergeable(cert)
+    for c in std.objectFields(params.cert_manager_certs)
+  ]
+);
+
 
 if std.length(ingressControllers) > 0 then
   {
