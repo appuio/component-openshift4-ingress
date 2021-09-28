@@ -142,6 +142,9 @@ type:: dictionary
 default:: `{}`
 
 Each entry in parameter `secrets` is deployed onto the cluster as a Kubernetes Secret with `type=kubernetes.io/tls`.
+Entries with `null` values are skipped.
+This allows users to remove secrets which were configured higher up in the hierarchy.
+
 The component has basic validation to ensure the secret contents are a plausible Kubernetes TLS secret.
 
 The dictionary keys are used as `metadata.name` for the resulting `Secret` resources.
@@ -155,6 +158,8 @@ type:: dictionary
 default:: `{}`
 
 Each entry in parameter `cert_manager_certs` is deployed onto the cluster as a cert-manager `Certificate` resource.
+Entries with `null` values are skipped.
+This allows users to remove certificates which were configured higher up in the hierarchy.
 
 The dictionary keys are used as `metadata.name` and `spec.secretName` for the resulting `Certificate` resources.
 The dictionary values are then directly directly merged into the mostly empty `Certificate` resources.
