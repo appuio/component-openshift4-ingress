@@ -48,7 +48,13 @@ local extraSecrets = std.filter(
     } + com.makeMergeable(scontent);
     if scontent != null then
       if isTlsSecret(secret) then
-        secret
+        secret {
+          stringData+: {
+            [if 'tls.key' in secret.stringData then 'tls.key']: super['tls.key'] + '\n',
+            [if 'tls.crt' in secret.stringData then 'tls.crt']: super['tls.crt'] + '\n',
+            [if 'ca.crt' in secret.stringData then 'ca.crt']: super['ca.crt'] + '\n',
+          },
+        }
       else
         error "Invalid secret definition for key '%s'. This component expects secret definitions which are valid for kubernetes.io/tls secrets." % s
     for s in std.objectFields(params.secrets)
