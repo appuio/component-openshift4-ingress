@@ -151,6 +151,9 @@ The dictionary keys are used as `metadata.name` for the resulting `Secret` resou
 The dictionary values are directly merged into a `Secret` resource which only has `type=kubernetes.io/tls` set.
 The secrets are created in the namespace indicated by parameter `namespace`.
 
+The OpenShift authentication operator generates a secret which contains the certificate and secret key of the ingress default certificate in a single field.
+To ensure that the concatenated data is always valid, the component appends a trailing newline to each field of the provided secret.
+
 == `cert_manager_certs`
 
 [horizontal]
