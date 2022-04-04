@@ -35,7 +35,7 @@ type:: string
 default:: `${facts:cloud}`
 
 The name of the cloud provider where the DNS service is hosted.
-This usually should be the fact `cloud.provider`
+Except for special cases, this parameter should always be set to `${facts:cloud}`.
 
 
 == `cloud.credentials`
