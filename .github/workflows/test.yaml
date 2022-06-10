@@ -5,7 +5,7 @@ on:
       - master
 
 env:
-  COMPONENT_NAME: openshift4-ingress
+  COMPONENT_NAME: Openshift 4 Ingress
 
 jobs:
   linting:
