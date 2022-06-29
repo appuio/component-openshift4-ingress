@@ -21,3 +21,6 @@ parameters:
 
     secrets: {}
     cert_manager_certs: {}
+
+    syn_monitoring:
+      enabled: false
