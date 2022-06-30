@@ -29,6 +29,7 @@ local params = inv.parameters.openshift4_ingress;
           },
         },
       ],
+      jobLabel: 'name',
       selector: {
         matchLabels: {
           name: 'ingress-operator',
@@ -36,6 +37,33 @@ local params = inv.parameters.openshift4_ingress;
       },
       namespaceSelector: {
         matchNames: [ 'openshift-ingress-operator' ],
+      },
+    },
+  },
+  '20_monitoring/10_serviceMonitor_ingress': prometheus.ServiceMonitor('ingress-controller-default') {
+    metadata+: {
+      namespace: 'syn-mon-%s' % [ params.namespace ],
+    },
+    spec: {
+      endpoints: [
+        {
+          bearerTokenFile: '/var/run/secrets/kubernetes.io/serviceaccount/token',
+          interval: '30s',
+          port: 'metrics',
+          scheme: 'https',
+          tlsConfig: {
+            caFile: '/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt',
+            serverName: 'router-internal-default.openshift-ingress.svc',
+          },
+        },
+      ],
+      selector: {
+        matchLabels: {
+          'ingresscontroller.operator.openshift.io/owning-ingresscontroller': 'default',
+        },
+      },
+      namespaceSelector: {
+        matchNames: [ 'openshift-ingress' ],
       },
     },
   },
