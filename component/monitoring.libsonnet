@@ -12,7 +12,6 @@ local params = inv.parameters.openshift4_ingress;
   '20_monitoring/00_namespace': prometheus.RegisterNamespace(
     kube.Namespace('syn-mon-%s' % [ params.namespace ])
   ),
-  '20_monitoring/01_networkPolicy': prometheus.NetworkPolicy(),
   '20_monitoring/10_serviceMonitor_operator': prometheus.ServiceMonitor('ingress-operator') {
     metadata+: {
       namespace: 'syn-mon-%s' % [ params.namespace ],
@@ -25,12 +24,11 @@ local params = inv.parameters.openshift4_ingress;
           port: 'metrics',
           scheme: 'https',
           tlsConfig: {
-            caFile: '/etc/prometheus/configmaps/serving-certs-ca-bundle/service-ca.crt',
+            caFile: '/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt',
             serverName: 'metrics.openshift-ingress-operator.svc',
           },
         },
       ],
-      jobLabel: 'component',
       selector: {
         matchLabels: {
           name: 'ingress-operator',
