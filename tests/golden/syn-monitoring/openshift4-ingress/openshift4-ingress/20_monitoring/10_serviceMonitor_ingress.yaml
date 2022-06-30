@@ -3,8 +3,8 @@ kind: ServiceMonitor
 metadata:
   annotations: {}
   labels:
-    name: ingress-operator
-  name: ingress-operator
+    name: ingress-controller-default
+  name: ingress-controller-default
   namespace: syn-mon-openshift-ingress
 spec:
   endpoints:
@@ -14,11 +14,10 @@ spec:
       scheme: https
       tlsConfig:
         caFile: /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
-        serverName: metrics.openshift-ingress-operator.svc
-  jobLabel: name
+        serverName: router-internal-default.openshift-ingress.svc
   namespaceSelector:
     matchNames:
-      - openshift-ingress-operator
+      - openshift-ingress
   selector:
     matchLabels:
-      name: ingress-operator
+      ingresscontroller.operator.openshift.io/owning-ingresscontroller: default

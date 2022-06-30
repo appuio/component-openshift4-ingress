@@ -7,6 +7,15 @@ local prometheus = import 'lib/prometheus.libsonnet';
 local inv = kap.inventory();
 local params = inv.parameters.openshift4_ingress;
 
+local clusterRole = kube.ClusterRole('openshift-ingress-metrics') {
+  rules: [
+    {
+      apiGroups: [ 'route.openshift.io' ],
+      resources: [ 'routers/metrics' ],
+      verbs: [ 'get', 'list', 'watch' ],
+    },
+  ],
+};
 
 {
   '20_monitoring/00_namespace': prometheus.RegisterNamespace(
@@ -39,6 +48,17 @@ local params = inv.parameters.openshift4_ingress;
         matchNames: [ 'openshift-ingress-operator' ],
       },
     },
+  },
+  '20_monitoring/10_ingress_clusterrole': clusterRole,
+  '20_monitoring/10_ingress_clusterrolebinding': kube.ClusterRoleBinding('openshift-ingress-metrics') {
+    roleRef_: clusterRole,
+    subjects: [
+      {
+        kind: 'ServiceAccount',
+        name: 'prometheus-monitoring',
+        namespace: 'syn-monitoring',
+      },
+    ],
   },
   '20_monitoring/10_serviceMonitor_ingress': prometheus.ServiceMonitor('ingress-controller-default') {
     metadata+: {
