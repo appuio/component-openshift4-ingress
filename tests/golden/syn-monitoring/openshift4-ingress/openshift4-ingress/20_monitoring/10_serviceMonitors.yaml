@@ -5,7 +5,7 @@ metadata:
   labels:
     name: ingress-operator
   name: ingress-operator
-  namespace: syn-monitoring-openshift-ingress
+  namespace: syn-monitoring-openshif4-ingress
 spec:
   endpoints:
     - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
@@ -35,7 +35,7 @@ metadata:
   labels:
     name: ingress-controller-default
   name: ingress-controller-default
-  namespace: syn-monitoring-openshift-ingress
+  namespace: syn-monitoring-openshif4-ingress
 spec:
   endpoints:
     - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
@@ -64,7 +64,7 @@ metadata:
   labels:
     name: ingress-controller-foo
   name: ingress-controller-foo
-  namespace: syn-monitoring-openshift-ingress
+  namespace: syn-monitoring-openshif4-ingress
 spec:
   endpoints:
     - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token

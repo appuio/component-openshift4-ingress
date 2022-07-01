@@ -65,7 +65,7 @@ local ingressControllers =
 
 
 local serviceMonitors = [ operatorServiceMonitor ] + [ ingressServiceMonitor(ing) for ing in ingressControllers ];
-local monNS = 'syn-monitoring-%s' % [ params.namespace ];
+local monNS = 'syn-monitoring-openshift4-ingress';
 
 {
   '20_monitoring/00_namespace': prometheus.RegisterNamespace(
