@@ -17,10 +17,58 @@ local clusterRole = kube.ClusterRole('openshift-ingress-metrics') {
   ],
 };
 
+local monNS = 'syn-mon-%s' % [ params.namespace ];
+
+local saRef = {
+  kind: 'ServiceAccount',
+  name: 'prometheus-monitoring',
+  namespace: 'syn-monitoring',
+};
+
+local ingressServiceMonitor(name) = prometheus.ServiceMonitor('ingress-controller-%s' % [ name ]) {
+  metadata+: {
+    namespace: 'syn-mon-%s' % [ params.namespace ],
+  },
+  spec: {
+    endpoints: [
+      {
+        bearerTokenFile: '/var/run/secrets/kubernetes.io/serviceaccount/token',
+        interval: '30s',
+        port: 'metrics',
+        scheme: 'https',
+        tlsConfig: {
+          caFile: '/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt',
+          serverName: 'router-internal-%s.openshift-ingress.svc' % [ name ],
+        },
+      },
+    ],
+    selector: {
+      matchLabels: {
+        'ingresscontroller.operator.openshift.io/owning-ingresscontroller': name,
+      },
+    },
+    namespaceSelector: {
+      matchNames: [ 'openshift-ingress' ],
+    },
+  },
+};
+
+local ingressControllers =
+  if params.ingressControllers != null
+  then std.objectFields(params.ingressControllers)
+  else [];
+
+
 {
   '20_monitoring/00_namespace': prometheus.RegisterNamespace(
-    kube.Namespace('syn-mon-%s' % [ params.namespace ])
+    kube.Namespace(monNS)
   ),
+  '20_monitoring/10_ingress_clusterrole': clusterRole,
+  '20_monitoring/10_ingress_clusterrolebinding': kube.ClusterRoleBinding('openshift-ingress-metrics') {
+    roleRef_: clusterRole,
+    subjects: [ saRef ],
+  },
+
   '20_monitoring/10_serviceMonitor_operator': prometheus.ServiceMonitor('ingress-operator') {
     metadata+: {
       namespace: 'syn-mon-%s' % [ params.namespace ],
@@ -49,42 +97,5 @@ local clusterRole = kube.ClusterRole('openshift-ingress-metrics') {
       },
     },
   },
-  '20_monitoring/10_ingress_clusterrole': clusterRole,
-  '20_monitoring/10_ingress_clusterrolebinding': kube.ClusterRoleBinding('openshift-ingress-metrics') {
-    roleRef_: clusterRole,
-    subjects: [
-      {
-        kind: 'ServiceAccount',
-        name: 'prometheus-monitoring',
-        namespace: 'syn-monitoring',
-      },
-    ],
-  },
-  '20_monitoring/10_serviceMonitor_ingress': prometheus.ServiceMonitor('ingress-controller-default') {
-    metadata+: {
-      namespace: 'syn-mon-%s' % [ params.namespace ],
-    },
-    spec: {
-      endpoints: [
-        {
-          bearerTokenFile: '/var/run/secrets/kubernetes.io/serviceaccount/token',
-          interval: '30s',
-          port: 'metrics',
-          scheme: 'https',
-          tlsConfig: {
-            caFile: '/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt',
-            serverName: 'router-internal-default.openshift-ingress.svc',
-          },
-        },
-      ],
-      selector: {
-        matchLabels: {
-          'ingresscontroller.operator.openshift.io/owning-ingresscontroller': 'default',
-        },
-      },
-      namespaceSelector: {
-        matchNames: [ 'openshift-ingress' ],
-      },
-    },
-  },
+  '20_monitoring/10_serviceMonitors_ingress': [ ingressServiceMonitor(ing) for ing in ingressControllers ],
 }

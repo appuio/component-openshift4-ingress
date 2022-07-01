@@ -27,3 +27,11 @@ parameters:
   openshift4_ingress:
     syn_monitoring:
       enabled: true
+    ingressControllers:
+      foo:
+        replicas: 2
+        nodePlacement:
+          nodeSelector:
+            matchLabels:
+              node-role.kubernetes.io/infra: ""
+
