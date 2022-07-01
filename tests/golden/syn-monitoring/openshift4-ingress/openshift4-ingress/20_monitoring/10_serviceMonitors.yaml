@@ -5,17 +5,17 @@ metadata:
   labels:
     name: ingress-operator
   name: ingress-operator
-  namespace: syn-monitoring-openshif4-ingress
+  namespace: syn-monitoring-openshift4-ingress
 spec:
   endpoints:
     - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
       interval: 30s
-      port: metrics
-      relabelings:
+      metricRelabelings:
         - action: drop
           regex: (go_.*|process_.*|promhttp_.*)
           sourceLabels:
             - __name__
+      port: metrics
       scheme: https
       tlsConfig:
         caFile: /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
@@ -35,17 +35,17 @@ metadata:
   labels:
     name: ingress-controller-default
   name: ingress-controller-default
-  namespace: syn-monitoring-openshif4-ingress
+  namespace: syn-monitoring-openshift4-ingress
 spec:
   endpoints:
     - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
       interval: 30s
-      port: metrics
-      relabelings:
+      metricRelabelings:
         - action: drop
           regex: (go_.*|process_.*|promhttp_.*)
           sourceLabels:
             - __name__
+      port: metrics
       scheme: https
       tlsConfig:
         caFile: /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
@@ -64,17 +64,17 @@ metadata:
   labels:
     name: ingress-controller-foo
   name: ingress-controller-foo
-  namespace: syn-monitoring-openshif4-ingress
+  namespace: syn-monitoring-openshift4-ingress
 spec:
   endpoints:
     - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
       interval: 30s
-      port: metrics
-      relabelings:
+      metricRelabelings:
         - action: drop
           regex: (go_.*|process_.*|promhttp_.*)
           sourceLabels:
             - __name__
+      port: metrics
       scheme: https
       tlsConfig:
         caFile: /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt

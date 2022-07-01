@@ -29,7 +29,7 @@ local operatorServiceMonitor = prometheus.ServiceMonitor('ingress-operator') {
   targetNamespace: 'openshift-ingress-operator',
   endpoints: {
     metrics: prometheus.ServiceMonitorHttpsEndpoint('metrics.%s.svc' % [ sm.targetNamespace ]) {
-      relabelings: [ prometheus.DropRuntimeMetrics ],
+      metricRelabelings: [ prometheus.DropRuntimeMetrics ],
     },
   },
   selector: {
@@ -48,7 +48,7 @@ local ingressServiceMonitor(name) = prometheus.ServiceMonitor('ingress-controlle
   targetNamespace: 'openshift-ingress',
   endpoints: {
     router: prometheus.ServiceMonitorHttpsEndpoint('router-internal-%s.%s.svc' % [ name, sm.targetNamespace ]) {
-      relabelings: [ prometheus.DropRuntimeMetrics ],
+      metricRelabelings: [ prometheus.DropRuntimeMetrics ],
     },
   },
   selector: {
