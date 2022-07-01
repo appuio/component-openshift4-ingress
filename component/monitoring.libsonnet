@@ -7,6 +7,12 @@ local prometheus = import 'lib/prometheus.libsonnet';
 local inv = kap.inventory();
 local params = inv.parameters.openshift4_ingress;
 
+local promInstance =
+  if params.monitoring.instance != '' then
+    params.monitoring.instance
+  else
+    inv.parameters.prometheus.defaultInstance;
+
 local clusterRole = kube.ClusterRole('openshift-ingress-metrics') {
   rules: [
     {
@@ -91,7 +97,8 @@ local serviceMonitors = [ operatorServiceMonitor ] + [ ingressServiceMonitor(ing
 
 {
   '20_monitoring/00_namespace': prometheus.RegisterNamespace(
-    kube.Namespace(monNS)
+    kube.Namespace(monNS),
+    instance=promInstance
   ),
   '20_monitoring/10_ingress_clusterrole': clusterRole,
   '20_monitoring/10_ingress_clusterrolebinding': kube.ClusterRoleBinding('openshift-ingress-metrics') {

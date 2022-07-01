@@ -1,3 +1,6 @@
+applications:
+  - prometheus
+
 parameters:
   kapitan:
     dependencies:

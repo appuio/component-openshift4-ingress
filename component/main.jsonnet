@@ -110,7 +110,7 @@ if std.length(ingressControllers) > 0 then
     [if std.length(extraSecrets) > 0 then '10_extra_secrets']: extraSecrets,
     [if std.length(extraCerts) > 0 then '10_extra_certificates']: extraCerts,
   } +
-  if params.syn_monitoring.enabled then
+  if params.syn_monitoring.enabled && std.member(inv.applications, 'prometheus') then
     import 'monitoring.libsonnet'
   else
     {}
