@@ -23,7 +23,7 @@ parameters:
     cert_manager_certs: {}
 
     monitoring:
-      enabled: false
+      enabled: true
       instance: ''
       enableServiceMonitors:
         ingress-operator: false
