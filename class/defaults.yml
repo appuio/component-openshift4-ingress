@@ -22,5 +22,9 @@ parameters:
     secrets: {}
     cert_manager_certs: {}
 
-    syn_monitoring:
+    monitoring:
       enabled: false
+      instance: ''
+      enableServiceMonitors:
+        ingress-operator: false
+        ingress-controller-default: true

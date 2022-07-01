@@ -1,0 +1,14 @@
+apiVersion: operator.openshift.io/v1
+kind: IngressController
+metadata:
+  annotations: {}
+  labels:
+    name: foo
+  name: foo
+  namespace: openshift-ingress-operator
+spec:
+  nodePlacement:
+    nodeSelector:
+      matchLabels:
+        node-role.kubernetes.io/infra: ''
+  replicas: 2

@@ -27,6 +27,8 @@ parameters:
   openshift4_ingress:
     syn_monitoring:
       enabled: true
+      enableServiceMonitors:
+        ingress-operator: true
     ingressControllers:
       foo:
         replicas: 2

@@ -21,3 +21,27 @@ spec:
   selector:
     matchLabels:
       ingresscontroller.operator.openshift.io/owning-ingresscontroller: default
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  annotations: {}
+  labels:
+    name: ingress-controller-foo
+  name: ingress-controller-foo
+  namespace: syn-mon-openshift-ingress
+spec:
+  endpoints:
+    - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+      interval: 30s
+      port: metrics
+      scheme: https
+      tlsConfig:
+        caFile: /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+        serverName: router-internal-foo.openshift-ingress.svc
+  namespaceSelector:
+    matchNames:
+      - openshift-ingress
+  selector:
+    matchLabels:
+      ingresscontroller.operator.openshift.io/owning-ingresscontroller: foo
