@@ -3,14 +3,49 @@ kind: ServiceMonitor
 metadata:
   annotations: {}
   labels:
-    name: ingress-controller-default
-  name: ingress-controller-default
-  namespace: syn-mon-openshift-ingress
+    name: ingress-operator
+  name: ingress-operator
+  namespace: syn-monitoring-openshift-ingress
 spec:
   endpoints:
     - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
       interval: 30s
       port: metrics
+      relabelings:
+        - action: drop
+          regex: (go_.*|process_.*|promhttp_.*)
+          sourceLabels:
+            - __name__
+      scheme: https
+      tlsConfig:
+        caFile: /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+        serverName: metrics.openshift-ingress-operator.svc
+  jobLabel: name
+  namespaceSelector:
+    matchNames:
+      - openshift-ingress-operator
+  selector:
+    matchLabels:
+      name: ingress-operator
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  annotations: {}
+  labels:
+    name: ingress-controller-default
+  name: ingress-controller-default
+  namespace: syn-monitoring-openshift-ingress
+spec:
+  endpoints:
+    - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+      interval: 30s
+      port: metrics
+      relabelings:
+        - action: drop
+          regex: (go_.*|process_.*|promhttp_.*)
+          sourceLabels:
+            - __name__
       scheme: https
       tlsConfig:
         caFile: /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
@@ -29,12 +64,17 @@ metadata:
   labels:
     name: ingress-controller-foo
   name: ingress-controller-foo
-  namespace: syn-mon-openshift-ingress
+  namespace: syn-monitoring-openshift-ingress
 spec:
   endpoints:
     - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
       interval: 30s
       port: metrics
+      relabelings:
+        - action: drop
+          regex: (go_.*|process_.*|promhttp_.*)
+          sourceLabels:
+            - __name__
       scheme: https
       tlsConfig:
         caFile: /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt

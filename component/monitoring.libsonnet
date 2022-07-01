@@ -23,47 +23,15 @@ local clusterRole = kube.ClusterRole('openshift-ingress-metrics') {
   ],
 };
 
-local monNS = 'syn-mon-%s' % [ params.namespace ];
-
-local saRef = {
-  kind: 'ServiceAccount',
-  name: 'prometheus-monitoring',
-  namespace: 'syn-monitoring',
-};
-
-local serviceMonitor(name) = prometheus.ServiceMonitor(name) {
+local operatorServiceMonitor = prometheus.ServiceMonitor('ingress-operator') {
   local sm = self,
 
-  service:: '',
-  targetNamespace:: '',
-  scheme:: 'https',
-  selector:: {},
-  spec: {
-    endpoints: [
-      {
-        bearerTokenFile: '/var/run/secrets/kubernetes.io/serviceaccount/token',
-        interval: '30s',
-        port: 'metrics',
-        scheme: sm.scheme,
-        tlsConfig: {
-          caFile: '/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt',
-          serverName: '%s.%s.svc' % [ sm.service, sm.targetNamespace ],
-        },
-      },
-    ],
-    namespaceSelector: {
-      matchNames: [ sm.targetNamespace ],
-    },
-    selector: sm.selector,
-  },
-};
-
-local operatorServiceMonitor = serviceMonitor('ingress-operator') {
-  metadata+: {
-    namespace: 'syn-mon-%s' % [ params.namespace ],
-  },
-  service: 'metrics',
   targetNamespace: 'openshift-ingress-operator',
+  endpoints: {
+    metrics: prometheus.ServiceMonitorHttpsEndpoint('metrics.%s.svc' % [ sm.targetNamespace ]) {
+      relabelings: [ prometheus.DropRuntimeMetrics ],
+    },
+  },
   selector: {
     matchLabels: {
       name: 'ingress-operator',
@@ -74,12 +42,15 @@ local operatorServiceMonitor = serviceMonitor('ingress-operator') {
   },
 };
 
-local ingressServiceMonitor(name) = serviceMonitor('ingress-controller-%s' % [ name ]) {
-  metadata+: {
-    namespace: monNS,
-  },
-  service: 'router-internal-%s' % [ name ],
+local ingressServiceMonitor(name) = prometheus.ServiceMonitor('ingress-controller-%s' % [ name ]) {
+  local sm = self,
+
   targetNamespace: 'openshift-ingress',
+  endpoints: {
+    router: prometheus.ServiceMonitorHttpsEndpoint('router-internal-%s.%s.svc' % [ name, sm.targetNamespace ]) {
+      relabelings: [ prometheus.DropRuntimeMetrics ],
+    },
+  },
   selector: {
     matchLabels: {
       'ingresscontroller.operator.openshift.io/owning-ingresscontroller': name,
@@ -94,6 +65,7 @@ local ingressControllers =
 
 
 local serviceMonitors = [ operatorServiceMonitor ] + [ ingressServiceMonitor(ing) for ing in ingressControllers ];
+local monNS = 'syn-monitoring-%s' % [ params.namespace ];
 
 {
   '20_monitoring/00_namespace': prometheus.RegisterNamespace(
@@ -103,12 +75,17 @@ local serviceMonitors = [ operatorServiceMonitor ] + [ ingressServiceMonitor(ing
   '20_monitoring/10_ingress_clusterrole': clusterRole,
   '20_monitoring/10_ingress_clusterrolebinding': kube.ClusterRoleBinding('openshift-ingress-metrics') {
     roleRef_: clusterRole,
-    subjects: [ saRef ],
+    subjects: [ prometheus.ServiceAccountRef(instance=promInstance) ],
   },
   '20_monitoring/10_serviceMonitors': std.filter(
     function(it) it != null,
     [
-      if com.getValueOrDefault(params.monitoring.enableServiceMonitors, sm.metadata.name, true) then sm
+      if com.getValueOrDefault(params.monitoring.enableServiceMonitors, sm.metadata.name, true) then
+        sm {
+          metadata+: {
+            namespace: monNS,
+          },
+        }
       for sm in serviceMonitors
     ]
   ),

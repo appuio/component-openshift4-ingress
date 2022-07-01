@@ -11,7 +11,7 @@ parameters:
         source: https://raw.githubusercontent.com/projectsyn/component-resource-locker/v2.0.0/lib/resource-locker.libjsonnet
         output_path: vendor/lib/resource-locker.libjsonnet
       - type: https
-        source: https://raw.githubusercontent.com/projectsyn/component-prometheus/master/lib/prometheus.libsonnet
+        source: https://raw.githubusercontent.com/projectsyn/component-prometheus/feat/lib-servicemonitor/lib/prometheus.libsonnet
         output_path: vendor/lib/prometheus.libsonnet
 
   resource_locker:
@@ -28,7 +28,7 @@ parameters:
           enabled: true
   
   openshift4_ingress:
-    syn_monitoring:
+    monitoring:
       enabled: true
       enableServiceMonitors:
         ingress-operator: true

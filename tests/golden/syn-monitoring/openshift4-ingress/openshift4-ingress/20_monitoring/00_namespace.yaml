@@ -4,5 +4,5 @@ metadata:
   annotations: {}
   labels:
     monitoring.syn.tools/monitoring: 'true'
-    name: syn-mon-openshift-ingress
-  name: syn-mon-openshift-ingress
+    name: syn-monitoring-openshift-ingress
+  name: syn-monitoring-openshift-ingress
