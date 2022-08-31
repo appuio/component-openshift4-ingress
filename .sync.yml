@@ -1,9 +1,0 @@
-:global:
-  componentName: Openshift 4 Ingress
-  feature_goUnitTests: false
-  feature_goldenTests: true
-  testMatrix:
-    key: instance
-    entries:
-      - defaults
-      - syn-monitoring
