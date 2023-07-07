@@ -110,11 +110,7 @@ if std.length(ingressControllers) > 0 then
     [if anyControllerUsesAcme then 'acmeIssuer']: acme.issuer,
     [if std.length(extraSecrets) > 0 then '10_extra_secrets']: extraSecrets,
     [if std.length(extraCerts) > 0 then '10_extra_certificates']: extraCerts,
-  } +
-  if params.monitoring.enabled && std.member(inv.applications, 'prometheus') then
-    import 'monitoring.libsonnet'
-  else
-    {}
+  }
 else
   // if no ingressControllers are configured, only emit an empty `.gitkeep`
   // file.
