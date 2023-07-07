@@ -3,7 +3,7 @@ local cm = import 'lib/cert-manager.libsonnet';
 local com = import 'lib/commodore.libjsonnet';
 local kap = import 'lib/kapitan.libjsonnet';
 local kube = import 'lib/kube.libjsonnet';
-local resourcelocker = import 'lib/resource-locker.libjsonnet';
+local po = import 'lib/patch-operator.libsonnet';
 local inv = kap.inventory();
 
 local params = inv.parameters.openshift4_ingress;
@@ -19,7 +19,7 @@ local anyControllerUsesAcme = std.foldl(
   false,
 );
 
-local defaultNamespacePatch = resourcelocker.Patch(kube.Namespace('default'), {
+local defaultNamespacePatch = po.Patch(kube.Namespace('default'), {
   metadata: {
     labels: {
       'network.openshift.io/policy-group': 'hostNetwork',
