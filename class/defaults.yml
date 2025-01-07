@@ -1,5 +1,7 @@
 parameters:
   openshift4_ingress:
+    =_metadata:
+      multi_tenant: true
     namespace: openshift-ingress
     cloud:
       provider: ${facts:cloud}
