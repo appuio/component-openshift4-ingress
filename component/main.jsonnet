@@ -130,6 +130,10 @@ local ingressControllerManifests = {
               'k8s.cloudscale.ch/loadbalancer-force-hostname':
                 'ingress.%s' %
                 std.join('.', std.split(params.ingressControllers[name].domain, '.')[1:]),
+              'k8s.cloudscale.ch/loadbalancer-floating-ips':
+                std.manifestJsonMinified(
+                  [ std.get(epps_cloudscale, 'floatingIP') ]
+                ),
             } + std.get(epps_cloudscale, 'serviceAnnotations', {}) {
               'k8s.cloudscale.ch/loadbalancer-pool-protocol': 'proxyv2',
             },
