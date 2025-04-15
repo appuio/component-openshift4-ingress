@@ -86,6 +86,11 @@ if std.length(ingressControllers) > 0 then
     local annotations =
       if std.objectHas(params.ingressControllerAnnotations, name) then
         params.ingressControllerAnnotations[name],
+    local epps = std.get(
+      params.ingressControllers[name],
+      'endpointPublishingStrategy',
+      { type: 'Private' },
+    ),
 
     [name]:
       [ kube._Object('operator.openshift.io/v1', 'IngressController', name) {
@@ -97,7 +102,16 @@ if std.length(ingressControllers) > 0 then
           [if hasAcmeSupport then 'defaultCertificate']: {
             name: acmeCertName,
           },
-        } + params.ingressControllers[name],
+        } + params.ingressControllers[name] + {
+          [if std.get(epps, 'type', '') == 'cloudscale-lbaas' then
+            'endpointPublishingStrategy']:
+            {
+              private: {
+                protocol: 'PROXY',
+              },
+              type: 'Private',
+            },
+        },
       } ] +
       if usesAcme(name) then
         [

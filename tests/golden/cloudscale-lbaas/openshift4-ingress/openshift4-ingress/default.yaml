@@ -1,0 +1,18 @@
+apiVersion: operator.openshift.io/v1
+kind: IngressController
+metadata:
+  annotations: {}
+  labels:
+    name: default
+  name: default
+  namespace: openshift-ingress-operator
+spec:
+  endpointPublishingStrategy:
+    private:
+      protocol: PROXY
+    type: Private
+  nodePlacement:
+    nodeSelector:
+      matchLabels:
+        node-role.kubernetes.io/infra: ''
+  replicas: 2

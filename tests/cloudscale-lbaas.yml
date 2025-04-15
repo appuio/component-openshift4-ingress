@@ -1,3 +1,17 @@
-# Overwrite parameters here
+parameters:
+  kapitan:
+    dependencies:
+      - type: https
+        source: https://raw.githubusercontent.com/projectsyn/component-patch-operator/v1.1.0/lib/patch-operator.libsonnet
+        output_path: vendor/lib/patch-operator.libsonnet
 
-# parameters: {...}
+  patch_operator:
+    patch_serviceaccount:
+      name: patch-sa
+    namespace: syn-patch-operator
+
+  openshift4_ingress:
+    ingressControllers:
+      default:
+        endpointPublishingStrategy:
+          type: cloudscale-lbaas
