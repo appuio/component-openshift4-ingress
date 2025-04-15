@@ -79,46 +79,103 @@ local extraCerts = std.filter(
   ]
 );
 
+local ingressControllerManifests = {
+  local acmeCertName = 'acme-wildcard-' + name,
+  local annotations =
+    if std.objectHas(params.ingressControllerAnnotations, name) then
+      params.ingressControllerAnnotations[name],
+  local epps = std.get(
+    params.ingressControllers[name],
+    'endpointPublishingStrategy',
+    { type: 'Private' },
+  ),
+  local is_cloudscale_lbaas =
+    std.get(epps, 'type', '') == 'cloudscale-lbaas',
 
-if std.length(ingressControllers) > 0 then
-  {
-    local acmeCertName = 'acme-wildcard-' + name,
-    local annotations =
-      if std.objectHas(params.ingressControllerAnnotations, name) then
-        params.ingressControllerAnnotations[name],
-    local epps = std.get(
-      params.ingressControllers[name],
-      'endpointPublishingStrategy',
-      { type: 'Private' },
-    ),
+  [name]: {
+    ic: kube._Object('operator.openshift.io/v1', 'IngressController', name) {
+      metadata+: {
+        namespace: params.namespace + '-operator',
+        [if annotations != null then 'annotations']: annotations,
+      },
+      spec: {
+        [if hasAcmeSupport then 'defaultCertificate']: {
+          name: acmeCertName,
+        },
+      } + params.ingressControllers[name] + {
+        [if std.get(epps, 'type', '') == 'cloudscale-lbaas' then
+          'endpointPublishingStrategy']:
+          {
+            private: {
+              protocol: 'PROXY',
+            },
+            type: 'Private',
+          },
+      },
+    },
 
-    [name]:
-      [ kube._Object('operator.openshift.io/v1', 'IngressController', name) {
+    cert: if usesAcme(name) then
+      acme.cert(acmeCertName, [ '*.' + params.ingressControllers[name].domain ]),
+
+    lb_service: if is_cloudscale_lbaas then
+      local epps_cloudscale = std.get(epps, 'cloudscale', {});
+      kube.Service('appuio-%s-lb' % name) {
         metadata+: {
-          namespace: params.namespace + '-operator',
-          [if annotations != null then 'annotations']: annotations,
+          // NOTE: this is required so the service object can be applied
+          // during bootstrap.
+          namespace: params.namespace,
+          annotations+:
+            {
+              //TODO(sg): figure out how to do this best
+              'k8s.cloudscale.ch/loadbalancer-force-hostname':
+                'ingress.%s' %
+                std.join('.', std.split(params.ingressControllers[name].domain, '.')[1:]),
+            } + std.get(epps_cloudscale, 'serviceAnnotations', {}) {
+              'k8s.cloudscale.ch/loadbalancer-pool-protocol': 'proxyv2',
+            },
+          labels+: std.get(epps_cloudscale, 'serviceLabels', {}),
         },
         spec: {
-          [if hasAcmeSupport then 'defaultCertificate']: {
-            name: acmeCertName,
-          },
-        } + params.ingressControllers[name] + {
-          [if std.get(epps, 'type', '') == 'cloudscale-lbaas' then
-            'endpointPublishingStrategy']:
+          type: 'LoadBalancer',
+          externalTrafficPolicy: 'Local',
+          ports: [
             {
-              private: {
-                protocol: 'PROXY',
-              },
-              type: 'Private',
+              name: 'http',
+              port: 80,
+              protocol: 'TCP',
+              targetPort: 'http',
             },
+            {
+              name: 'https',
+              port: 443,
+              protocol: 'TCP',
+              targetPort: 'https',
+            },
+          ],
+          selector: {
+            'ingresscontroller.operator.openshift.io/deployment-ingresscontroller': name,
+          },
+
         },
-      } ] +
-      if usesAcme(name) then
-        [
-          acme.cert(acmeCertName, [ '*.' + params.ingressControllers[name].domain ]),
-        ] else []
-    for name in ingressControllers
-  } + {
+      },
+  }
+  for name in ingressControllers
+};
+
+
+if std.length(ingressControllerManifests) > 0 then
+  {
+    local manifests = ingressControllerManifests[name],
+    [name]: std.prune([ manifests.ic, manifests.cert ])
+    for name in std.objectFields(ingressControllerManifests)
+  } +
+  {
+    local manifests = ingressControllerManifests[name],
+    ['%s_lb_service' % name]: manifests.lb_service
+    for name in std.objectFields(ingressControllerManifests)
+    if ingressControllerManifests[name].lb_service != null
+  }
+  + {
     '00_label_patches': defaultNamespacePatch,
     '01_aggregated_clusterroles': (import 'aggregated-clusterroles.libsonnet'),
     [if anyControllerUsesAcme then 'acmeIssuer']: acme.issuer,

@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    k8s.cloudscale.ch/loadbalancer-force-hostname: ingress.c-green-test-1234.syn.tools
+    k8s.cloudscale.ch/loadbalancer-pool-protocol: proxyv2
+  labels:
+    name: appuio-default-lb
+  name: appuio-default-lb
+  namespace: openshift-ingress
+spec:
+  externalTrafficPolicy: Local
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: http
+    - name: https
+      port: 443
+      protocol: TCP
+      targetPort: https
+  selector:
+    ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default
+  type: LoadBalancer

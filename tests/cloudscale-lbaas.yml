@@ -13,5 +13,8 @@ parameters:
   openshift4_ingress:
     ingressControllers:
       default:
+        domain: apps.${cluster:name}.syn.tools
         endpointPublishingStrategy:
           type: cloudscale-lbaas
+          cloudscale:
+            serviceAnnotations: {}

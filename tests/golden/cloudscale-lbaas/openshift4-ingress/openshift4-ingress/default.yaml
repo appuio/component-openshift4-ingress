@@ -1,12 +1,12 @@
 apiVersion: operator.openshift.io/v1
 kind: IngressController
 metadata:
-  annotations: {}
   labels:
     name: default
   name: default
   namespace: openshift-ingress-operator
 spec:
+  domain: apps.c-green-test-1234.syn.tools
   endpointPublishingStrategy:
     private:
       protocol: PROXY
