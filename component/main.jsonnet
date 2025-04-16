@@ -105,7 +105,12 @@ local ingressControllerManifests = {
       } + params.ingressControllers[name] + {
         [if std.get(epps, 'type', '') == 'cloudscale-lbaas' then
           'endpointPublishingStrategy']:
-          {
+          if name == 'default' then {
+            hostNetwork: {
+              protocol: 'PROXY',
+            },
+            type: 'HostNetwork',
+          } else {
             private: {
               protocol: 'PROXY',
             },

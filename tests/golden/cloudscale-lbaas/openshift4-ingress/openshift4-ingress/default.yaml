@@ -8,9 +8,9 @@ metadata:
 spec:
   domain: apps.c-green-test-1234.syn.tools
   endpointPublishingStrategy:
-    private:
+    hostNetwork:
       protocol: PROXY
-    type: Private
+    type: HostNetwork
   nodePlacement:
     nodeSelector:
       matchLabels:
