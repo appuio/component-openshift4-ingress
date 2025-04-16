@@ -134,14 +134,28 @@ local ingressControllerManifests = {
           namespace: params.namespace,
           annotations+:
             {
-              //TODO(sg): figure out how to do this best
+              // Set force-hostname if no floating IP is configured.
+              // Assumption: Cilium doesn't understand ipMode=Proxy yet, so we
+              // need to force hostname, since we expect that DNS name for the
+              // ingress resolves to the service IP when no floating IP is
+              // configured. NOTE: this can be overridden via
+              // `serviceAnnotations`.
               [if cs_vip == null then 'k8s.cloudscale.ch/loadbalancer-force-hostname']:
                 'ingress.%s' %
                 std.join('.', std.split(params.ingressControllers[name].domain, '.')[1:]),
+              // Configure `floating-ips` annotation if
+              // `cloudscale.floatingIP` is set.
               [if cs_vip != null then 'k8s.cloudscale.ch/loadbalancer-floating-ips']:
                 std.manifestJsonMinified([ cs_vip ]),
+              // Configure LB protocol to proxyv2 if ingress is configured
+              // with PROXY protocol, tcp otherwise.
               'k8s.cloudscale.ch/loadbalancer-pool-protocol':
                 if cs_proto == 'PROXY' then 'proxyv2' else 'tcp',
+              // TODO(sg): Update default annotations to set custom http check
+              // with Red Hat-recommended check on HAproxy stats port. TBD how
+              // this will look, since we don't expose the stats port in the
+              // LB service and don't know the port number for `Private`
+              // ingresses a priori.
             } + std.get(epps_cloudscale, 'serviceAnnotations', {}),
           labels+: std.get(epps_cloudscale, 'serviceLabels', {}),
         },
