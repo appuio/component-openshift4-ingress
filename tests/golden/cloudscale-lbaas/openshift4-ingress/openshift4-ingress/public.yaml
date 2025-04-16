@@ -1,0 +1,13 @@
+apiVersion: operator.openshift.io/v1
+kind: IngressController
+metadata:
+  labels:
+    name: public
+  name: public
+  namespace: openshift-ingress-operator
+spec:
+  domain: public.c-green-test-1234.syn.tools
+  endpointPublishingStrategy:
+    private:
+      protocol: TCP
+    type: Private

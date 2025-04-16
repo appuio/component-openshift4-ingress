@@ -91,6 +91,9 @@ local ingressControllerManifests = {
   ),
   local is_cloudscale_lbaas =
     std.get(epps, 'type', '') == 'cloudscale-lbaas',
+  local epps_cloudscale = std.get(epps, 'cloudscale', {}),
+  local cs_proto = if is_cloudscale_lbaas then
+    std.get(epps_cloudscale, 'protocol', 'PROXY'),
 
   [name]: {
     ic: kube._Object('operator.openshift.io/v1', 'IngressController', name) {
@@ -107,12 +110,12 @@ local ingressControllerManifests = {
           'endpointPublishingStrategy']:
           if name == 'default' then {
             hostNetwork: {
-              protocol: 'PROXY',
+              protocol: cs_proto,
             },
             type: 'HostNetwork',
           } else {
             private: {
-              protocol: 'PROXY',
+              protocol: cs_proto,
             },
             type: 'Private',
           },
@@ -123,7 +126,7 @@ local ingressControllerManifests = {
       acme.cert(acmeCertName, [ '*.' + params.ingressControllers[name].domain ]),
 
     lb_service: if is_cloudscale_lbaas then
-      local epps_cloudscale = std.get(epps, 'cloudscale', {});
+      local cs_vip = std.get(epps_cloudscale, 'floatingIP');
       kube.Service('appuio-%s-lb' % name) {
         metadata+: {
           // NOTE: this is required so the service object can be applied
@@ -132,16 +135,14 @@ local ingressControllerManifests = {
           annotations+:
             {
               //TODO(sg): figure out how to do this best
-              'k8s.cloudscale.ch/loadbalancer-force-hostname':
+              [if cs_vip == null then 'k8s.cloudscale.ch/loadbalancer-force-hostname']:
                 'ingress.%s' %
                 std.join('.', std.split(params.ingressControllers[name].domain, '.')[1:]),
-              'k8s.cloudscale.ch/loadbalancer-floating-ips':
-                std.manifestJsonMinified(
-                  [ std.get(epps_cloudscale, 'floatingIP') ]
-                ),
-            } + std.get(epps_cloudscale, 'serviceAnnotations', {}) {
-              'k8s.cloudscale.ch/loadbalancer-pool-protocol': 'proxyv2',
-            },
+              [if cs_vip != null then 'k8s.cloudscale.ch/loadbalancer-floating-ips']:
+                std.manifestJsonMinified([ cs_vip ]),
+              'k8s.cloudscale.ch/loadbalancer-pool-protocol':
+                if cs_proto == 'PROXY' then 'proxyv2' else 'tcp',
+            } + std.get(epps_cloudscale, 'serviceAnnotations', {}),
           labels+: std.get(epps_cloudscale, 'serviceLabels', {}),
         },
         spec: {

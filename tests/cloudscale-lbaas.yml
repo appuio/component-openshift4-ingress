@@ -18,3 +18,12 @@ parameters:
           type: cloudscale-lbaas
           cloudscale:
             serviceAnnotations: {}
+      public:
+        domain: public.${cluster:name}.syn.tools
+        endpointPublishingStrategy:
+          type: cloudscale-lbaas
+          cloudscale:
+            floatingIP: 192.0.2.100
+            protocol: TCP
+            serviceAnnotations:
+              k8s.cloudscale.ch/loadbalancer-force-hostname: ingress-public.${cluster:name}.syn.tools
