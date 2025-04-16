@@ -1,0 +1,23 @@
+apiVersion: redhatcop.redhat.io/v1alpha1
+kind: Patch
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+  labels:
+    name: namespace-default-d6a0af6dd07e8a3
+  name: namespace-default-d6a0af6dd07e8a3
+  namespace: syn-patch-operator
+spec:
+  patches:
+    namespace-default-d6a0af6dd07e8a3-patch:
+      patchTemplate: |-
+        "metadata":
+          "labels":
+            "network.openshift.io/policy-group": "hostNetwork"
+      patchType: application/strategic-merge-patch+json
+      targetObjectRef:
+        apiVersion: v1
+        kind: Namespace
+        name: default
+  serviceAccountRef:
+    name: patch-sa

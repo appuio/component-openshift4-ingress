@@ -1,0 +1,29 @@
+parameters:
+  kapitan:
+    dependencies:
+      - type: https
+        source: https://raw.githubusercontent.com/projectsyn/component-patch-operator/v1.1.0/lib/patch-operator.libsonnet
+        output_path: vendor/lib/patch-operator.libsonnet
+
+  patch_operator:
+    patch_serviceaccount:
+      name: patch-sa
+    namespace: syn-patch-operator
+
+  openshift4_ingress:
+    ingressControllers:
+      default:
+        domain: apps.${cluster:name}.syn.tools
+        endpointPublishingStrategy:
+          type: cloudscale-lbaas
+          cloudscale:
+            serviceAnnotations: {}
+      public:
+        domain: public.${cluster:name}.syn.tools
+        endpointPublishingStrategy:
+          type: cloudscale-lbaas
+          cloudscale:
+            floatingIP: 192.0.2.100
+            protocol: TCP
+            serviceAnnotations:
+              k8s.cloudscale.ch/loadbalancer-force-hostname: ingress-public.${cluster:name}.syn.tools

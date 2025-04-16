@@ -6,6 +6,11 @@ metadata:
   name: default
   namespace: openshift-ingress-operator
 spec:
+  domain: apps.c-green-test-1234.syn.tools
+  endpointPublishingStrategy:
+    hostNetwork:
+      protocol: PROXY
+    type: HostNetwork
   nodePlacement:
     nodeSelector:
       matchLabels:
