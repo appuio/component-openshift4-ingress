@@ -1,23 +1,72 @@
-apiVersion: redhatcop.redhat.io/v1alpha1
-kind: Patch
+apiVersion: espejote.io/v1alpha1
+kind: ManagedResource
 metadata:
   annotations:
-    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+    syn.tools/description: |
+      Patches the default namespace to add the hostNetwork policy group.
   labels:
-    name: namespace-default-d6a0af6dd07e8a3
-  name: namespace-default-d6a0af6dd07e8a3
-  namespace: syn-patch-operator
+    app.kubernetes.io/name: patch-default-namespace
+  name: patch-default-namespace
+  namespace: openshift-ingress
 spec:
-  patches:
-    namespace-default-d6a0af6dd07e8a3-patch:
-      patchTemplate: |-
-        "metadata":
-          "labels":
-            "network.openshift.io/policy-group": "hostNetwork"
-      patchType: application/strategic-merge-patch+json
-      targetObjectRef:
+  serviceAccountRef:
+    name: patch-default-namespace
+  template: |-
+    {
+        "apiVersion": "v1",
+        "kind": "Namespace",
+        "metadata": {
+            "labels": {
+                "network.openshift.io/policy-group": "hostNetwork"
+            },
+            "name": "default"
+        }
+    }
+  triggers:
+    - name: namespace
+      watchResource:
         apiVersion: v1
         kind: Namespace
         name: default
-  serviceAccountRef:
-    name: patch-sa
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/name: patch-default-namespace
+    managedresource.espejote.io/name: patch-default-namespace
+  name: patch-default-namespace
+  namespace: openshift-ingress
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: patch-default-namespace
+    managedresource.espejote.io/name: patch-default-namespace
+  name: ingress:patch-default-namespace
+rules:
+  - apiGroups:
+      - ''
+    resourceNames:
+      - default
+    resources:
+      - namespaces
+    verbs:
+      - '*'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/name: patch-default-namespace
+    managedresource.espejote.io/name: patch-default-namespace
+  name: ingress:patch-default-namespace
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: ingress:patch-default-namespace
+subjects:
+  - kind: ServiceAccount
+    name: patch-default-namespace
+    namespace: openshift-ingress
