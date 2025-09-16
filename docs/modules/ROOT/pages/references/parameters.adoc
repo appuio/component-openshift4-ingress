@@ -135,6 +135,29 @@ kubectl get secret ingress-cert-issuer-credentials \
   base64 --decode
 --
 
+== `patchDualStack`
+
+[horizontal]
+type:: dictionary
+
+=== `patchDualStack.enabled`
+
+[horizontal]
+type:: bool
+default:: `false`
+
+When this parameter is set to true, the component deploys an Espejote `Admission` mutating webhook which intercepts newly created router pods and sets environment variable `ROUTER_IP_V4_V6_MODE` to `v4v6`.
+
+=== `patchDualStack.objectSelector`
+
+[horizontal]
+type:: dictionary
+default:: See https://github.com/appuio/component-openshift4-ingress/blob/master/class/defaults.yml[`class/defaults.yml`]
+
+The value of this parameter is used as is for the Espejote `Admission`'s `webhookConfiguration.objectSelector` field.
+By default, the component configures the webhook to select all router pods.
+Users can override this parameter to only select a subset of router pods.
+
 == `secrets`
 
 [horizontal]

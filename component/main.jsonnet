@@ -194,6 +194,8 @@ if std.length(ingressControllers) > 0 then
     [if anyControllerUsesAcme then 'acmeIssuer']: acme.issuer,
     [if std.length(extraSecrets) > 0 then '10_extra_secrets']: extraSecrets,
     [if std.length(extraCerts) > 0 then '10_extra_certificates']: extraCerts,
+    [if params.patchDualStack.enabled then '99_patch_dual_stack']:
+      import 'patch-dual-stack.libsonnet',
   }
 else
   // if no ingressControllers are configured, only emit an empty `.gitkeep`
