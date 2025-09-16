@@ -21,5 +21,13 @@ parameters:
               node-role.kubernetes.io/infra: ""
     ingressControllerAnnotations: {}
 
+    patchDualStack:
+      enabled: false
+      objectSelector:
+        matchExpressions:
+          - key: 'ingresscontroller.operator.openshift.io/deployment-ingresscontroller'
+            operator: 'Exists'
+
+
     secrets: {}
     cert_manager_certs: {}
